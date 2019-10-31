@@ -128,9 +128,21 @@ Below is a summary matrix of our progress with each approach.
 <h4>Evaluating Results from Approach 2</h4>
 For approach 2, we decided to start off with a generic 5 layer classification DNN. Our first layer had 512 relu activation units, the next had 256 relu units, the next had 128 relu units, the next had 64 relu units and the final one had 7 softmax activation units for our emotion classification. For our loss funciton we selected cross-entropy loss since it's common loss function used in classificaion tasks and for our optimizer we used Adam.
 <br><br>
-After running 20 epochs, we found that we were overfitting - our validation accuracy was stagnant but training accuracy kept increasing. We added an early stopping condition to stop training if validation loss doesn't increase after 5 epochs. We also added a learning rate reducer to decrease the learning rate by a factor 0.5 if validation loss if stagnant for 5 epochs. 
-
-Below are the precision and recall metrics from our training data. The 0-6 are the indexes of the 7 emotion classes.
+After running 20 epochs, we found that the model is overfitting - our validation accuracy was stagnant but training accuracy kept increasing. We employed different techniques to reduce validation loss of the model:
+<br><br>
+1. Early stopping condition: to stop training if validation loss doesn't increase after 5 epochs
+<br><br>
+2. Learning rate reducer: to decrease the learning rate by a factor 0.5 if validation loss if stagnant for 5 epochs
+<br><br>
+3. Dropout: to prevent co-adaptation of feature detectors hence prevent overfitting
+<br><br>
+We experimented with a range of dropout values and different dropout layers setup to identify the optimal setup (0.5 dropout after first layer, 0.2 dropout after third layer).
+<div style="text-align: left; padding-top: 10px;">
+<img style="height: 200px;" alt="Training Metrics" src="dropout.png">
+</div>
+<br><br>
+Below are the precision and recall metrics from our training data. The 0-6 are the indexes of the 7 emotion classes-
+[0 : angry, 1 : disgust, 2 : fear, 3 : happy, 4 : sad, 5 : surprise, 6 : neutral]
 <div style="text-align: left; padding-top: 10px;">
 <img style="height: 200px;" alt="Training Metrics" src="training_precisionreacall.png">
 </div>
@@ -140,8 +152,22 @@ Below are the precision and recall metrics from our validation data.
 <div style="text-align: left; padding-top: 10px;">
 <img style="height: 200px;" alt="Validation Metrics" src="validationprecisionrecall.png">
 </div>
+
 <br><br>
-It seems like we are still overfitting pretty drastically. The fer2013 dataset contains a few non frontal faces, a few distorted faces and even some non-face images. Since our feature space is so rich/dense, it seems like our model is able to tune itself to the random effects in the training data pretty easily. We did expect our naive DNN to overfit. For the next phase of the project we want to look into tuning our model to minimize overfitting. 
+While we have some successes with images in the fer validation set as well as our own photos, it seems like we are still overfitting pretty drastically.
+<br><br>
+<h4>Plausible predictions (Source: FER2013, team member):</h4>
+<div style="text-align: left; padding-top: 10px;">
+<img style="height: 200px;" alt="Validation Metrics" src="success_test_images.png">
+</div>
+<br><br>
+<h4>Inaccurate predictions (Source: FaceDB):</h4>
+<div style="text-align: left; padding-top: 10px;">
+<img style="height: 200px;" alt="Validation Metrics" src="skewed_test_images.png">
+</div>
+<br><br>
+The FER2013 dataset contains a few non-frontal faces, a few distorted faces and even some non-face images. Since our feature space is so rich/dense, it seems like our model is able to tune itself to the random effects in the training data pretty easily.  We did expect our naive DNN to overfit. Furthermore, the skewness of the dataset distribution also contributes to the skewness in prediction outcomes. Out of 35,887 images in the FER2013 dataset, 8,989 are tagged as "happy" while only 527 are tagged as "disgust". This contributed to a disproportionally high number of happy predictions.
+In the next phase of the project, we want to train our model with other dataset with higher definition and more variety to reduce overfitting and improve accuracy. 
   <footer> 
   </footer>
 
