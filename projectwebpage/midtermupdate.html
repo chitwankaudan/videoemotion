@@ -43,7 +43,7 @@ color: #FF9900;
 <hr>
 </div>
 
-<!-- Goal -->
+<!-- Abstract -->
 <h3>Abstract</h3>
 Do this last
 <div style="text-align: left;">
@@ -57,164 +57,91 @@ One application of our project would be real-time sentiment analysis for the sta
 
 <!-- Approach text -->
 <h3>Approach</h3>
-Our team is taking 3 distinct approaches to the emotion detection problem. We plan to compare and contrast the accuracies and complexities of each method to determine which will be best for our video application. Since we knew computational efficiency was important to our application, we made sure each of the approaches tried to minimize the require compute power in some manner.
+To build our application, we plan to first train an emotion detection classifier on image datasets. To extend to video, we plan to pull frames from a video at a constant rate and apply our pretrained classifier on each frame.
+
+Our team is taking 3 distinct approaches to build the emotion detection classifier. We plan to compare and contrast the accuracies and complexities of each method to determine which will be best for our video application. Since we knew computational efficiency was important to our application, we made sure each of the approaches tried to minimize the require compute power in some manner.
 
 <h4>Approach 1: Training the Mini-Xception CNN from stratch</h4>
-Originally proposed by Arriaga in 2018 <b>(LINK)</b>, the mini-xception CNN was designed to be a lightweight model that could run real time emotion classification in hardware constrainted applications such as robotics. Below is the full architecture of mini-xception. The general idea in this approach is to remove the fully connected layers typically found in feature extraction CNNs and replace them with residules modules and depth-wise separable convolutions. Residual modules change the mapping between 2 layers so the new features become the difference between original feature map and desired feature map. Depth-wise separable convolutions reduce computation reuqired in convolving first preforming depth-wise convolution separately on each channel and then preforming point-wise convolution.
+Originally proposed by <a href="https://arxiv.org/pdf/1710.07557.pdf">Arriaga</a> in 2018, the mini-xception CNN was designed to be a lightweight model that could run real time emotion classification in hardware constrainted applications such as robotics. Below is the full architecture of mini-xception. The general idea in this approach is to remove the fully connected layers typically found in feature extraction CNNs and replace them with residules modules and depth-wise separable convolutions. Residual modules change the mapping between 2 layers so the new features become the difference between original feature map and desired feature map. Depth-wise separable convolutions reduce computation reuqired in convolving first preforming depth-wise convolution separately on each channel and then preforming point-wise convolution.
 <div style="text-align: left; padding-top: 10px;">
 <img style="height: 400px;" alt="Mini-Xception Architecture" src="mini-xception.png">
 </div>
 <h4>Approach 2: Using VGG-16 to extract features and training our own neural network classifier</h4>
 A common approach we found online was <i>tranfer learning</i>- using a pretrained deep learning model to extract features and then training a final classification layer for any custom application. We decided to use a pretrained VGG-16 model, a general purpose object detection network created by the Visual Gemometry Group. In this approach, we first used the first 13 convolutional layers of VGG-16 to extract features and then trained a final neural network to classify the features into the 7 emotion categories. 
 <h4>Approach 3: Manually extracting features and training our own classifier</h4>
-For our final approach, we decided to manually extract features and then use a non-deep learning classifier. A common approach we found was using facial landmarks to extract gemometric features. <b>(LINK)</b> <b>(LINK)</b> In 2018, Jeong used the dlib's frontal face detector to extract 64 facial landmarks and manually extracted distance ratios and angles between the landmarks as seen below. Using these features, she constructed a hierachical weighted random forest (WRF) and achieved comparable validation accuracies to DNN based methods. In this approach, we hope to achieve the same accuracies by manually extracting our own geometric features and then training a WRF to classify emotion between the 7 categories.
+For our final approach, we decided to manually extract features and then use a non-deep learning classifier. A common approach we found was using facial landmarks to extract geometric features. In 2018, <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6308562/">Jeong</a> used the dlib's frontal face detector to extract 64 facial landmarks and manually extracted distance ratios and angles between the landmarks as seen below. Using these features, she constructed a hierachical weighted random forest (WRF) and achieved comparable validation accuracies to DNN based methods. In this approach, we hope to achieve the same accuracies by manually extracting our own geometric features and then training a WRF to classify emotion between the 7 categories.
 <div style="text-align: left; padding-top: 10px;">
 <img style="height: 400px;" alt="Geometric Features" src="geometric_features.png">
 </div>
-<!-- Approach figure --> 
 
 <hr>
-<!-- Datasets -->
+<!-- Experiments & Design -->
 <h3>Experiments & Design</h3>
-In order to fairly compare the accuracies across the 3 approaches, we decided to use the fer2013 dataset for all 3 methods with 85% of the data (30,504 images) for training/validation and the remaing 15% (5,383 images) for testing. To evaluate the performance of each classifier we decided to compare the confusion matrix of the 7 emotions. As a baseline, we considered what the confusion matrix would look like if our classifier was randomly guess.  
-<h4>Datasets</h4>
-We are using a combination of human images and animated images to train our deep learning model, and several publicly available videos and self-recorded as video inputs after the minimum viable product is built.
-<ul type="disc">
-    <li>
-      <a href="https://faces.mpdl.mpg.de/imeji/">FACES</a> - dataset contains images of 171 faces, displaying 2 sets of 6 facial expressions: neutrality, sadness, disgust, fear, anger, and happiness. Resulting in a total of 2052 images
-    </li>
-    <li>
-      <a href="http://app.visgraf.impa.br/database/faces/details/6/">FacesDB - VISGRAF faces database</a> - dataset contains images of 38 individuals corresponding to six universal facial expressions and other expressions referring to 5 samples containing mouth and eyes open and / or closed, summarizing 532 samples in total
-    </li>
-    <li>
-      <a href="http://www.pitt.edu/~emotion/ck-spread.htm">Cohn-Kanade AU-Coded Expression Database</a> - dataset contains images of 97 individuals corresponging to a total of 486 samples
-    </li>
-    <li>
-      <a href="https://zenodo.org/record/3451524#.XZoY3y2ZO_s">JAFFE database</a> - dataset contains 10 Japanese female models, displaying 7 facial expressions constituting a total of 213 images
-    </li>
-    <li>
-      <a href="https://mmifacedb.eu">MMI database</a> - dataset contains images and videos of 75 subjects, summarizing 2900 samples in total
-    </li>
-    <li>
-      <a href="http://www.consortium.ri.cmu.edu/data/ck/">Cohn-Kanade (CK and CK+)</a> - dataset contains images of 220 individuals, summarizing 1079 samples
-    </li>
-    <li>
-      <a href="https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data">FER dataset</a> - dataset contains 7178 samples containing the 6 facial expressions
-    </li>
-    <li>
-      <a href="https://computervisiononline.com/dataset/1105138659">AFEW videos</a> - dataset contains 700 images containing 6 facial expressions
-    </li>
-</ul>
-<h4>Anticipated Implementation Overview</h4>
-Note: We anticipate we will be able to implement everything in Python/Tensorflow.
+<h4>Experiential Set Up and Evaluation Metrics</h4>
+In order to fairly compare the accuracies across the 3 approaches, we decided to use the <a href="https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data">fer2013 dataset</a> (35,887 images) for all 3 methods with 85% of the data (30,504 images) for training/validation and the remaing 15% (5,383 images) for testing. To evaluate the performance of each classifier we decided to compare the confusion matrix of the 7 emotions. As a baseline, we considered what the confusion matrix would look like if our classifier was randomly guessing.
+
+<div style="text-align: left; padding-top: 10px;">
+<img style="height: 200px;" alt="Baseline Confusion Matrix" src="baseline.png">
+</div>
+
+<h4>Current State of Experiments</h4>
+Below is a summary matrix of our progress with each approach. 
 <br><br>
 <table style="width:90%">
   <table border="1|0">
     <tr>
-      <th style="padding-right: 50px">Experiment</th>
-      <th style="width: 50%">Methodology</th>
-      <th>Reference</th>
+      <th style="padding-right: 50px; width: 15%">Approach</th>
+      <th style="width: 45%">Progress & Roadblocks</th>
+      <th>Results</th>
     </tr>
     <tr>
-      <td>Facial Detection</td>
-      <td>Facial detection is an interesting and heavily researched field; however, it is not the main focus of our project. We plan to use David Sandberg’s FaceNet which is a Python/Tensorflow implementation of the MTCNN method for detecting faces from all angles. This method provides state of the art accuracy on the Labeled Faces in the Wild (LFW) dataset of 99.6%.
-    </td>
+      <td>Approach 1: Mini-Xception</td>
+      <td> We were able to translate the architecture described in <a href="https://arxiv.org/pdf/1710.07557.pdf">Arriaga 2018</a> into a Keras model; however, we are hitting a computational limit when we try to train fer2013 dataset on our CPUs. As a next step, we would like to set up Google Cloud account try to train the model on a GPU. 
+      </td>
       <td>
-        <ul type="disc">
-        <li><a href="https://arxiv.org/abs/1503.03832">Paper</a></li>
-        <li><a href="https://github.com/davidsandberg/facenet">Code</a></li>
-        </ul>
+        TBD
       </td>
     </tr>
+
     <tr>
-      <td>Feature Extraction</td>
-      <td>Feature extraction will be one of the focal points of our project, so we will be implementing a few methods of feature extraction and comparing the results and the computational cost of each method. Below are a list of methods we would like to try but this list is subject to change as we learn more about feature extraction. We may also run into computational limits and implementing a particular method is not possible for us.<p>We are aware than some of the traditional feature extraction algorithm implementations are available in OpenCV; however, we would like to implement these ourselves to gain a better understanding of the algorithms.</td>
+      <td>Approach 2: Transfer Learning with VGG-16</td>
+      <td> We sucessfully extracted features using the first 13 layers of VGG-16 and trained a neural network to classify emotions into the 7 classes. So far, on the fer2013 dataset we achieved a training accuracy of 0.91 and a validation accuracy of 0.47. On the right is the confusion matrix on the validation set. For each class, the model does better than the baseline; however accuracy is still fairly low for anger and surprise.
+      </td>
       <td>
-        <ul type="disc">
-          <li>
-            Geometric methods
-            <ul type="square">
-              <li>Landmark Euclidean Distance (LMED) <a href="https://dl.acm.org/citation.cfm?id=326498">Paper </a>
-              </li>
-              <li>
-            Eccentricity and linear features (Model S5) <a href="http://www.portointeractivecenter.org/site/wp-content/uploads/Real-Time-Emotion-Recognition_a-Novel-Method-for-Geometrical-Facial-Features-Extraction1.pdf">Paper </a>
-              </li>
-          </ul>
-          </li>
-          <li>
-            Appearance based methods
-            <ul type="square">
-              <li>Histogram of Oriented Gradients (HoG) <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4628009/">Paper </a>
-              </li>
-              <li>
-            Local Binary Patterns (LBP) <a href=" https://liris.cnrs.fr/Documents/Liris-5004.pdf">Paper </a>
-              </li>
-          </ul>
-          </li>
-        </ul>
-        
+        <img style="height: 300px;" alt="Approach 2 Confusion Matrix" src="approach2_confusion.png">
       </td>
     </tr>
+
     <tr>
-      <td>Learned Classification</td>
-      <td>We will be training own classifier although we will rely on some pretty high level tools (i.e. Tensorflow). We want to try a few classification models and compare/contrast their accuracy and runtimes.</td>
-      <td>
-        <ul type="disc">
-          <li>
-            Weighted Random Forest Classifier (WRF) <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6308562/">Paper </a>
-          </li>
-          <li>
-            Support Vector Machine (SVM) <a href="https://dl.acm.org/citation.cfm?id=3264989">Paper </a>
-          </li>
-          <li>
-            Convolutional Neural Network (CNN) / DenseNet <a href="https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8337514">Paper </a>
-          </li>
-        </ul>
-      </td>
-    </tr>
-    <tr>
-      <td>Output Modeling/Visualization</td>
-      <td>
-            As far as we are aware, output modeling/visualization to create time series plots will be our completely novel contribution in this project. Ideally, we would like to generate these plots in close to real time and build an online visualization tool. We anticipate we may have to do some post-processing (i.e. smoothing) on our classification results to build good visualizations but the exact details of the post processing will depend on our classification results.
-          <p>
-            Additionally, we would also like to run some multivariate change detection algorithms to see if changes our model predicts correspond to changes in the real world scene. 
+      <td>Approach 3: Manual Feature Extraction</td>
+      <td> We quickly found out that the dlib (the library that we are using to detect facial landmarks) is unable to detect any faces in the fer2013 dataset. Each face in fer2013 is 48x48 pixels and dlib frontal face detector becomes unreliable for faces smaller than 80x80 pixels. We tried to scale up the 48x48 to use the dlib face detector and the detection is still unsucessful with most images in fer2013. Although this means comparisons between the approaches won't be as fair, we decided to switched to the  <a href="http://www.consortium.ri.cmu.edu/ckagree/">CK+ dataset</a> for this approach. 
+      <br><br>
+      Joeng 2018 states that 84 distance ratios and 88 angles were extracted as geometric features from the 64 landmarks provided by dlib; however, the paper does not detail how to extract each feature. We've decided to extract our own geometric features based off heuristics (i.e. the distance between the eyebrows might be important in classifying emotions). So far, we have extract 55 distance ratios and 80 angles. As a next step, we will train a hierachical WRF to classify feature vectors into emotions.
       </td>
       <td>
+        TBD
       </td>
     </tr>
   </table>
 <hr>
-<!-- Success -->
-<h4>What does success look like</h4>
-Through our experimentation we will be trading off accuracy for computational viability, so we would like our end product to be able to run in real time and be as accurate as possible. Per our idea on applying this technology in union address sentiment analysis, we plan to test on several self-recorded videos featuring ourselves reacting to a speech.
-<p>
-  The final product will showcase a real time emotion detector, which would plot the facial expressions and denote the changes in the emotion. We would be able to identify with high accuracy when the sentiment of the conversation has changed looking at the expressions of the person. 
-<p>
-  This would enable us to have impact in various sectors, namely - more enhanced conversations for people with visual impairment. They would get a real time metric of the emotions of the person listening to their conversation, and as when the expressions change would have a more immersive effect on the conversations.
-<p>
-  Secondly, we would also test the same on the Union Address, picking up the sentiments of the address from the facial expressions of both parties. This would enable us to determine the impact (happy/sad - positive/negative) it has on the audience.
-<p>
-  Thirdly, we will be recodring ourselves watching various videos and our reactions to a speech, this would be the final test determining how accurate our product would be. Being able to detect the sentiments and changes in the emotions overtime during a conversation in real time would be our final aim. 
+
+<h4>Evaluating Results from Approach 2</h4>
+For approach 2, we decided to start off with a generic 5 layer classification DNN. Our first layer had 512 relu activation units, the next had 256 relu units, the next had 128 relu units, the next had 64 relu units and the final one had 7 softmax activation units for our emotion classification. For our loss funciton we selected cross-entropy loss since it's common loss function used in classificaion tasks and for our optimizer we used Adam.
 <br><br>
+After running 20 epochs, we found that we were overfitting - our validation accuracy was stagnant but training accuracy kept increasing. We added an early stopping condition to stop training if validation loss doesn't increase after 5 epochs. We also added a learning rate reducer to decrease the learning rate by a factor 0.5 if validation loss if stagnant for 5 epochs. 
 
-<hr>
-<!-- Uncertainties -->
-<h4>Uncertainties in potential outcomes</h4>
-<i>We may not be able to achieve state of the art accuracies.</i>
-<ul type="disc">
-    <li>Most papers we found about feature extraction methods describe in detail their mathematical approach but do not make their source code publically available. Our implementation will be our interpretation of these methods and may not achieve the same state of the art results described in the originating papers.</li>
-</ul>
-<i>Emotion predictions might be discontinuous across frames.</i>
-<ul type="disc">
-    <li>Depending on the model and the input video, it is possible that the top emotion prediction is different across consecutive frames. For example, in five consecutive frames, the output emotions might be “happy, happy, happy, sad, happy”. In this case, frame 4 might be a detection error. We will consider using exponential smoothing or vote-and-verify strategy to remove these noises. </li>
-</ul>
+Below are the precision and recall metrics from our training data. The 0-6 are the indexes of the 7 emotion classes.
+<div style="text-align: left; padding-top: 10px;">
+<img style="height: 200px;" alt="Training Metrics" src="training_precisionreacall.png">
+</div>
 
-
-
-
-  </p>
-
-  <hr>
+<br><br>
+Below are the precision and recall metrics from our validation data.
+<div style="text-align: left; padding-top: 10px;">
+<img style="height: 200px;" alt="Validation Metrics" src="validationprecisionrecall.png">
+</div>
+<br><br>
+It seems like we are still overfitting pretty drastically. The fer2013 dataset contains a few non frontal faces, a few distorted faces and even some non-face images. Since our feature space is so rich/dense, it seems like our model is able to tune itself to the random effects in the training data pretty easily. We did expect our naive DNN to overfit. For the next phase of the project we want to look into tuning our model to minimize overfitting. 
   <footer> 
   </footer>
 
