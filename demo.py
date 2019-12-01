@@ -37,21 +37,15 @@ class livedemo:
             frame = imutils.resize(frame, width=500) # resize frame to make processing for face detector
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            # Detect face and crop image to just face (input to emotion classifier)
-            faces = self.faceDetector.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
-            if len(faces) > 0:  # If face is detected...
-                for (x, y, w, h) in faces:
-                    # Display rectangle around face
-                    cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
-                    # Extract face and resize to optimal input for classifier
-                    face = gray[y:y+h, x:x+w]
-                    face = cv2.resize(face, (48, 48))
-                    cv2.imwrite('demo.jpg', face)
+            # Find face and return cropped frame
+            face = self.crop(gray, frame, "demo.py")
 
-                # Run emotion classifier
-                predict = self.predict(face) #how to viz? need to figure that out
-                print(predict)
+            # Run emotion classifier
+            predict = self.predict(face) #how to viz? need to figure that out
+            print("Predictions: ", predict)
 
+            # Visualize returned emotions
+            # TODO
 
             # Display the resulting frames
             cv2.imshow('Face', frame)
@@ -64,6 +58,27 @@ class livedemo:
         # Release video capture
         capture.release()
         cv2.destroyAllWindows()
+
+
+    def crop(self, gray, frame, outputPath):
+        """
+        Takes in a grayscale image and returns a cropped image that just includes the face.
+        """
+        # Detect face and crop image to just face (input to emotion classifier)
+        faces = self.faceDetector.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
+        if len(faces) > 0:  # If face is detected...
+            for (x, y, w, h) in faces:
+                
+                # Display rectangle around face in the frame
+                if frame is not None:
+                    cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+
+                # Extract face and resize to optimal input for classifier
+                face = gray[y:y+h, x:x+w]
+                face = cv2.resize(face, (48, 48))
+
+                cv2.imwrite('demo.jpg', face)   # Ideally, I would like to not have to do this
+                return frame
 
 
     def predict(self, face):
@@ -79,9 +94,10 @@ class livedemo:
 
 
     def extractFeatures(self, face):
+        face = cv2.imread("demo.jpg")   # Ideally, I would like to not have to do this
+
         #print("Nonwritten shape (Before reshaping)", face.shape)
         # Convert face image to tensor
-        face = cv2.imread("demo.jpg")   # must be written and read to use current model
         #print("Written shape (Before reshaping)", face.shape)
         faceTensor = np.expand_dims(face, axis=0)
         #print("Face shape when reading in (Before prepocessing)", faceTensor.shape)
@@ -98,6 +114,13 @@ def main():
     emotionClassifierPath =  './models/model.hdf5'
     demo = livedemo(faceDetectionPath, emotionClassifierPath, 'vgg')
     demo.launch()
+
+    """
+    # To run cropping for images
+    demo = livedemo(faceDetectionPath, emotionClassifierPath, 'vgg')
+    image = cv2.imreaad("pathtoimagehere")
+    demo.crop(image, frame=None, outputPath="outputPathhere")
+    """
 
 
 if __name__ == '__main__':
