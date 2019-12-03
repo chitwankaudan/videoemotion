@@ -5,11 +5,18 @@ from keras.models import load_model
 from keras.applications import vgg16
 from keras.applications.vgg16 import preprocess_input
 import numpy as np
+import matplotlib.pyplot as plt
 
-class livedemo:
+
+
+
+class livepredicts:
+    """
+    Using live webcam input to run the emotion classifier and build the visualization.
+    Written so it can run with all of our classification models
+    """
     def __init__(self, faceDetectionPath, motionClassifierPath, featureExtractor=''):
-
-        # Load face detection    
+        # Load face detector    
         self.faceDetector = cv2.CascadeClassifier(faceDetectionPath)
 
         # Load emotion classifier and emotion classes
@@ -20,44 +27,11 @@ class livedemo:
         # If applicable, load feature extractor
         if featureExtractor.lower() == 'vgg':
             self.featureExtractor = vgg16.VGG16(weights='imagenet', include_top=False)
-            # Pop the last 3 fully connected and softmax layers in vgg-16
-            for i in range(33, 41):
+            
+            for i in range(33, 41): # Pop the last 3 layers in vgg-16
                 self.featureExtractor.layers.pop()
         else:
             self.featureExtractor = None
-    
-    def launch(self):
-
-        # Start video capture
-        capture = cv2.VideoCapture(0)
-        while(True):
-
-            # Capture frame by frame and convert to grayscale
-            ret, frame = capture.read()
-            frame = imutils.resize(frame, width=500) # resize frame to make processing for face detector
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-            # Find face and return cropped frame
-            face = self.crop(gray, frame, "demo.py")
-
-            # Run emotion classifier
-            predict = self.predict(face) #how to viz? need to figure that out
-            print("Predictions: ", predict)
-
-            # Visualize returned emotions
-            # TODO
-
-            # Display the resulting frames
-            cv2.imshow('Face', frame)
-            #cv2.imshow()
-
-            # Exit video
-            if cv2.waitKey(1) & 0xFF == ord('c'):   # break if user types c
-                break
-
-        # Release video capture
-        capture.release()
-        cv2.destroyAllWindows()
 
 
     def crop(self, gray, frame, outputPath):
@@ -68,14 +42,14 @@ class livedemo:
         faces = self.faceDetector.detectMultiScale(gray,scaleFactor=1.3,minNeighbors=5)
         if len(faces) > 0:  # If face is detected...
             for (x, y, w, h) in faces:
-                
+
                 # Display rectangle around face in the frame
                 if frame is not None:
                     cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
 
                 # Extract face and resize to optimal input for classifier
                 face = gray[y:y+h, x:x+w]
-                face = cv2.resize(face, (48, 48))
+                face = imutils.resize(face, width=48)
 
                 cv2.imwrite('demo.jpg', face)   # Ideally, I would like to not have to do this
                 return frame
@@ -112,7 +86,7 @@ class livedemo:
 def main():
     faceDetectionPath = 'detector/haarcascade_frontalface_default.xml' # may switch out for MTCNN later
     emotionClassifierPath =  './models/model.hdf5'
-    demo = livedemo(faceDetectionPath, emotionClassifierPath, 'vgg')
+    demo = livepredicts(faceDetectionPath, emotionClassifierPath, 'vgg')
     demo.launch()
 
     """
