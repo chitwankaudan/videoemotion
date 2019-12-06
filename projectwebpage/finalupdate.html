@@ -14,7 +14,11 @@
 <style>
 body {
 padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-font-family: Arial, Helvetica, sans-serif
+padding-left: 125px;
+padding-right: 125px;
+font-size:20px;
+line-height: 1.5;
+font-family: Open Sans, sans-serif
 }
 .vis {
 color: #3366CC;
@@ -36,7 +40,7 @@ color: #FF9900;
 <div class="page-header", style="text-align: center">
 
 <!-- Title and Name --> 
-<h1>Real-time human emotions detection from videos</h1> 
+<h1 style="font-size:55; font-weight: normal;">Real-time human emotions detection from videos</h1> 
 <span style="font-size: 18px; line-height: 1.5em;">Chitwan Kaudan, Ling Yiu Ku, Raghav Apoorv, Tien T Dinh</span><br>
 <span style="font-size: 18px; line-height: 1.5em;">Fall 2019 | CS 6476 Computer Vision Class Project</span><br>
 <span style="font-size: 18px; line-height: 1.5em;">Georgia Institute of Technology</span>
@@ -44,70 +48,73 @@ color: #FF9900;
 </div>
 
 <!-- Abstract -->
-<h3>Abstract</h3>
-This project aims at extracting emotions from video in real time. To do so, we experiment with two approaches within deep learning: (1) Training the Mini-Xception CNN from scratch and (2) Using VGG-16 to extract features and training our own neural network classifier. Our results for both methods are somewhat overfitting, which we will explain how to tackle in ‘future work’ section. Our final product is a program that detects emotions from facial expressions overtime, which would be widely applicable in different fields.
-<div style="text-align: left;">
-<img style="height: 400px;" alt="" src="approach.png">
-</div>
-<h3>Introduction</h3>
-Facial expressions are a form of nonverbal communication and many studies have been conducted to classify facial expressions from images. Most studies and datasets classify expressions of seven universal emotions which include: anger, disgust, fear, happy, sad, surprise, neutral. We found that deep learning is one of the most popular methods used in practice now. In our project, we would like to experiment with two existing emotion detection algorithms within deep learning and determine which one extends best to detecting emotions over time (e.g. video). Adding a time component opens up the possibility of understanding the relative changes in emotions as reactions to some real-world stimulus. In addition, we would like to find a novel way to visualize the output of the emotion detection on video clips in real time.
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Abstract</h3>
+The ability for machines to recognize human emotions has important societal applications ranging from video based sentiment analysis to assisting people with visual impairments. This project aims to extract emotions from video and display a time series visualization of each emotion in real time. To do so, we experiment with two approaches within deep learning: (1) Training the Mini-Xception CNN from scratch and (2) Using VGG-16 to extract features and training our own neural network classifier. We found the Mini-Exception to be our best model with %REPLACE% overall training accuracy and %REPLACE% overall test accuracy. Our final application includes our best model and a visualization tool to run live demos.
+
+<figure style="text-align: left; padding-top: 10px;">
+  <figcaption>Figure 1: Application Overview</figcaption>
+  <img style="height: 500px;" alt="" src="approach1.png">
+</figure>
+
+
+
+
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Introduction</h3>
+Facial expressions are a crucial form of nonverbal communication and facial emotion classificatiers have a wide range of applications. One such application would be real-time sentiment analysis for the state of the union address. Instead of conduting a typical sentiment analysis that uses NLP on tweets or other direct surveying methods, we can extract emotions from video in real time and display changes in sentiment over time. Another popular application is determining when and what types of ads to serve during a Youtube video so the mood of the ad matches the mood of the content. 
+
+Emotion recognition is a heavily researched topic and in recent years deep learning approaches have dominanted the field. Although emotion recognition has improved substantionally with the introduction of deep learning, emotion detection "in the wild" is still an open reserach problem. In our project, we experiment with two existing deep learning approaches and determine which one extends best to detecting emotions over time (e.g. video). What's entirely new about our project is that we add a time component to the output visualization of the emotion classifier. Adding time opens up the possibility of understanding the relative changes in emotions as reactions to some real-world stimulus. 
 <br><br>
-One application of our project would be real-time sentiment analysis for the state of the union address. Instead of typical sentiment analysis that uses NLP on tweets or other direct surveying methods, our approach could extract emotions from video in real time, display smoothed changes in emotions over time and even conduct a variety of traditional time series analysis such as change detection. Another application could be determining when and what types of ads to serve during a Youtube video so the mood of the ad matches the mood of the content. We believe a program that detects emotion from facial expressions over time would be widely applicable.
+
 <hr>
 
 <!-- Approach text -->
-<h3>Approach</h3>
-To build our application, we plan to first train an emotion detection classifier on image datasets. To extend to video, we plan to pull frames from a video at a constant rate and apply our pre-trained classifier on each frame. Our team is taking 2 approaches to build the emotion detection classifier. We plan to compare and contrast the accuracies and complexities of each method to determine which will be best for our video application. Since we knew computational efficiency was important to our application, we made sure each of the approaches tried to minimize the required compute power in some manner.
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Approach</h3>
+To build our application, we first trained an emotion detection classifier on image datasets. Our team took 2 approaches to build the emotion detection classifier. We compared and contrasted the accuracies and complexities of each method to determine which will be the best model for our video application. Since we knew computational efficiency was important to our application, we made sure each of the approaches tried to minimize the required compute power in some manner. To extend to video, we pulled frames from a video at a constant rate, apply our pre-trained classifier on each frame and build an output visualization. 
 
-<h4>Approach 1: Training the Mini-Xception CNN from stratch</h4>
-Originally proposed by <a href="https://arxiv.org/pdf/1710.07557.pdf">Arriaga</a> in 2018, the mini-xception CNN was designed to be a lightweight model that could run real time emotion classification in hardware constrainted applications such as robotics. Below is the full architecture of mini-xception. The general idea in this approach is to remove the fully connected layers typically found in feature extraction CNNs and replace them with residules modules and depth-wise separable convolutions. Residual modules change the mapping between 2 layers so the new features become the difference between original feature map and desired feature map. Depth-wise separable convolutions reduce computation reuqired in convolving first preforming depth-wise convolution separately on each channel and then preforming point-wise convolution.
-<div style="text-align: left; padding-top: 10px;">
-<img style="height: 400px;" alt="Mini-Xception Architecture" src="mini-xception.png">
-</div>
-<h4>Approach 2: Using VGG-16 to extract features and training our own neural network classifier</h4>
-A common approach we found online was <i>tranfer learning</i>- using a pretrained deep learning model to extract features and then training a final classification layer for any custom application. We decided to use a pretrained VGG-16 model, a general purpose object detection network created by the Visual Gemometry Group. In this approach, we first used the first 13 convolutional layers of VGG-16 to extract features and then trained a final neural network to classify the features into the 7 emotion categories. 
+<h4 style="font-size:25px; font-weight: normal; margin-bottom: 10px">Part 1: Training the Image Classifier</h4>
+
+<h4>The Mini-Xception CNN Approach</h4>
+Originally proposed by <a href="https://arxiv.org/pdf/1710.07557.pdf">Arriaga</a> in 2018, the mini-xception CNN was designed to be a lightweight model that could run real time emotion classification in hardware constrainted applications such as robotics. Below is the full architecture of mini-xception. The general idea in this approach is to remove the fully connected layers typically found in feature extraction CNNs and replace them with residules modules and depth-wise separable convolutions. Residual modules change the mapping between 2 layers so the new features become the difference between original feature map and desired feature map. Depth-wise separable convolutions reduce computation required in convolving by first preforming convolution separately on each channel and then preforming point-wise convolution across all layers. We used the architecture described in Arriaga's paper as well as <a href="https://maelfabien.github.io/deeplearning/xception/">this</a> description of how Xceptions work to build the mini-Xception model in Keras.
+
+<figure style="text-align: left; padding-top: 10px;">
+  <figcaption>Figure 2: Mini-Xception Architecture</figcaption>
+  <img style="height: 400px;" alt="Mini-Xception Architecture" src="mini-xception.png">
+</figure>
+
+
+<h4>The Transfer Learning Approach</h4>
+A popular technique within deep learning is transfer learning which means using a pretrained DNN to build your features represenations and then training a classifier for you own domain. For our pretrained DNN, we used VGG-16, a general purpose object detection network created by the Visual Gemometry Group. We extracted features from our images using the first 13 convolutional layers of VGG-16 and experimented with different classifiers for the emotion recognition task. We tried a SVM classifier and a neural netwok (softmax) classifier.
 </div>
 
+<figure style="text-align: left; padding-top: 10px;">
+  <figcaption>Figure 3: VGG-16 Architecture</figcaption>
+  <img style="height: 400px;" alt="VGG-16 Architecture" src="VGG.png">
+</figure>
+
+<h4 style="font-size:25px; font-weight: normal; margin-bottom: 10px">Part 2: Extending to Video</h4>
+To extend our classification to videos, we build a program that takes every frame of the video, identifies and extracts the region with the face. For face detection, we used the <a href="https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml">Haar Cascades Frontal Face Detector</a> available on OpenCV. The extracted face is fed the feature extractor, whose output is then fed into the emotion classifier. The emotion classifer returns the probabilities with which it detects each of the 7 emotions. We built a real time visualization using matplotlib that plots these probabilities over time. 
 <hr>
+
 <!-- Experiments & Design -->
-<h3>Experiments & Design</h3>
-<h4>Experiential Set Up and Evaluation Metrics</h4>
-In order to fairly compare the accuracies across the 3 approaches, we decided to use the <a href="https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data">fer2013 dataset</a> (35,887 images) for all 3 methods with 85% of the data (30,504 images) for training/validation and the remaing 15% (5,383 images) for testing. To evaluate the performance of each classifier we decided to compare the confusion matrix of the 7 emotions. As a baseline, we considered what the confusion matrix would look like if our classifier was randomly guessing.
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Experiments and Design</h3>
+<h4 style="font-size:25px; font-weight: normal; margin-bottom: 10px">Experiential Set Up and Evaluation Metrics</h4>
+In order to fairly compare the accuracies across the 2 approaches, we decided to use the <a href="https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data">fer2013 dataset</a> (35,887 images) for both methods with 85% of the data (30,504 images) for training/validation and the remaining 15% (5,383 images) for testing. To evaluate the performance of each classifier we decided to compare the normalized confusion matrix of the 7 emotions. As a baseline, we considered what the confusion matrix would look like if our classifier was randomly guessing.
 
 <div style="text-align: left; padding-top: 10px;">
-<img style="height: 200px;" alt="Baseline Confusion Matrix" src="baseline.png">
+<img style="height: 350px;" alt="Baseline Confusion Matrix" src="baseline.png">
 </div>
 
-<h4>Current State of Experiments</h4>
-Below is a summary matrix of our progress with each approach. 
-<br><br>
-<table style="width:90%">
-  <table border="1|0">
-    <tr>
-      <th style="padding-right: 50px; width: 15%">Approach</th>
-      <th style="width: 45%">Progress & Roadblocks</th>
-      <th>Results</th>
-    </tr>
-    <tr>
-      <td>Approach 1: Mini-Xception</td>
-      <td> We were able to translate the architecture described in <a href="https://arxiv.org/pdf/1710.07557.pdf">Arriaga 2018</a> into a Keras model; however, we are hitting a computational limit when we try to train fer2013 dataset on our CPUs. As a next step, we would like to set up Google Cloud account try to train the model on a GPU. 
-      </td>
-      <td>
-        TBD
-      </td>
-    </tr>
+<h4 style="font-size:25px; font-weight: normal; margin-bottom: 10px">Results</h4>
+<h4>The Mini-Xception Approach</h4>
+We were able to translate the architecture from the Arriaga into Keras, but we hit a computational limit when we tried to train the mini-Xception on our CPUs. Ultimately, we had to use resources on Google Cloud to train the model on the full FER dataset. The model turned out to be not as computational lightweight to train as we had hoped. However, we did find that evaluating test images was fast enough that we could build a real time visualization.
 
-    <tr>
-      <td>Approach 2: Transfer Learning with VGG-16</td>
-      <td> We sucessfully extracted features using the first 13 layers of VGG-16 and trained a neural network to classify emotions into the 7 classes. So far, on the fer2013 dataset we achieved a training accuracy of 0.91 and a validation accuracy of 0.47. On the right is the confusion matrix on the validation set. For each class, the model does better than the baseline; however accuracy is still fairly low for anger and surprise.
-      </td>
-      <td>
-        <img style="height: 300px;" alt="Approach 2 Confusion Matrix" src="approach2_confusion.png">
-      </td>
-    </tr>
+<p>As suggested in the Arriaga paper, for the hyperparameters we used relu as our activation function and softmax for the final output classification, we use l2 regularization with weight 0.02 for each separable convolution layers. As suggested in the Introduction to Xception article, we used adam optimizer, cross entropy loss and 100 max epochs. The first time we ran the model, we noticed that after some time the model was overfitting where training loss was decreasing but validation loss was nonincreasing. To combat overfitting, we added batch normalization after each convolution layer and used early stopping with patience 20 epochs. At the end, we chose to keep the model with the lowest validation loss because we felt it would preform best on test data. </p>
 
-  </table>
-<hr>
+<p>Below is the normalized confusion matrix of the best mini_xception model on the test dataset.</p>
+
+REPLACE WITH CONFUSION MATRIX
+
+<p>Our mini-Xceptron does significantly better than baseline guessing where each class is 0.14. It seems like it's better at detecting happy and neutral than the other emotions. We expected this to a degree since happy and neutral are the 2 most populous classes in the FER dataset. </p>
 
 <h4>Evaluating Results from Approach 2</h4>
 For approach 2, we decided to start off with a generic 5 layer classification DNN. Our first layer had 512 relu activation units, the next had 256 relu units, the next had 128 relu units, the next had 64 relu units and the final one had 7 softmax activation units for our emotion classification. For our loss funciton we selected cross-entropy loss since it's common loss function used in classificaion tasks and for our optimizer we used Adam.
@@ -153,11 +160,40 @@ While we have some successes with images in the fer validation set as well as ou
 The FER2013 dataset contains a few non-frontal faces, a few distorted faces and even some non-face images. Since our feature space is so rich/dense, it seems like our model is able to tune itself to the random effects in the training data pretty easily.  We did expect our naive DNN to overfit. Furthermore, the skewness of the dataset distribution also contributes to the skewness in prediction outcomes. Out of 35,887 images in the FER2013 dataset, 8,989 are tagged as "happy" while only 527 are tagged as "disgust". This contributed to a disproportionally high number of happy predictions.
 In the next phase of the project, we want to train our model with other dataset with higher definition and more variety to reduce overfitting and improve accuracy. 
 
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Qualitative Results</h3>
+By testing the real time application on ourselves, we found that models were better at detecting some emotions than others. For example, happy was detected easily each time with high accuracy. Figure 6 contains a frame of a smiling sequence and the ouput probailites for that sequence. As you can see, the classifier confidently detects approximately 90% happy for sustained period of time. We believe the classifier is good at detecting happy because of the 35,887 images in the FER2013 dataset, 8,989 are happy images. Also, of all the emotions, conveying happiness results in the biggest change to facial features, so it might just be easier to learn happy than something more subtle like sad.
 
 
+<figure style="text-align: left; padding-top: 10px;">
+  <figcaption>Figure 6: Happy Input Frame and Ouput Classification</figcaption>
+  <img style="height: 200px;" alt="Happy Input" src="happy_chitwan.jpg" align="top">
+  <img style="height: 400px;" alt="Happy Output" src="happy.png">
+</figure>
+
+The mini-Xception classifier is also quite accurate in capturing neutral facial expressions. This might be because neutral was the 2nd more popular class in the FER dataset (6198 out of 35,887 images are neutral). We believe neutral does well because the examples of neutral in the FER dataset more closet align with the neutral expressions we made when testing the application. For sad, angry, and surprised, the example faces in FER are quite exaggerated but the neutral faces are fairly realistic.
+
+<figure style="text-align: left; padding-top: 10px;">
+  <figcaption>Figure 7: Neutral Input Frame and Ouput Classification</figcaption>
+  <img style="height: 200px;" alt="Neutral Input" src="nuetral_chitwan.jpg" align="top">
+  <img style="height: 400px;" alt="Neutral Output" src="neutral.png">
+</figure>
+
+Our model is not as good at recognizing surprise. Recognizing surprise seems to be contingent on opening your mouth which makes sense because most of the surprise examples in FER have open mouths. Even then, during testing we could never get the surprise probability to be greater than 0.3. In this example, the classifier would still classify this frame as surprise but at a much lower confidence level than it does for happy and neutral. 
+
+<figure style="text-align: left; padding-top: 10px;">
+  <figcaption>Figure 8: Suprise Input Frame and Ouput Classification</figcaption>
+  <img style="height: 200px;" alt="Surprise Input" src="surprise_chitwan.jpg" align="top">
+  <img style="height: 400px;" alt="Surprise Output" src="surprise.png">
+</figure>
+
+
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Conclusion and Future Work</h3>
+Through our experiments, we found that the transfer learning approach does a better overall job at classifying emotions from images. However, since our application was video based and in video form most faces are neautral, we "felt" the mini-Xception was a better model since it only ever classified images as neutral or happy. 
+
+<p>In future work, we would like to train both models on a more realistic dataset. One thing we noticed about FER2013 and many emoion datasets online was that most faces were wildly exaggerated emotions. When we tested the model on our own faces, we found we had to emulate those same extreme emotions for the classifer to work. If this classifier is to have a real world application, it should be able to detect more subtle/realistic expressions of human emotions. We believe training on a more realistic dataset would push the classifer to detecting more realistic displays of emotion. We would also like to run both models on slightly larger image sizes. The FER2013 dataset has 48x48 faces which made extract features from VGG and training our classifier possible on our CPUs. We are curious is a higher resolution image would allow our models to create a better feature map.</p>
 
 <!-- Reference text -->
-<h3>Reference</h3>
+<h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">References</h3>
 <font size="-0.5">
 <ul type="disc">
   <li>
@@ -167,9 +203,6 @@ In the next phase of the project, we want to train our model with other dataset 
     <a href="http://app.visgraf.impa.br/database/faces/details/6/">FacesDB - VISGRAF faces database</a> 
   </li>
   <li>
-      <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6308562/">"Driver’s Facial Expression Recognition in Real-Time for Safe Driving" Jeong and Ko, 2018</a> 
-  </li>
-  <li>
       <a href="https://arxiv.org/pdf/1710.07557.pdf/">"Real-time Convolutional Neural Networks for Emotion and Gender Classification"
         Arriaga, Plöger and Valdenegro, 2017</a> 
   </li>
@@ -177,6 +210,10 @@ In the next phase of the project, we want to train our model with other dataset 
       <a href="https://medium.com/@birdortyedi_23820/deep-learning-lab-episode-3-fer2013-c38f2e052280">"Deep Learning Lab"
         Kinli, 2018</a> 
   </li>
+  <li>
+    <a href="https://maelfabien.github.io/deeplearning/xception/">XCeption Models and Depthwise Separable Convolutions</a>
+  </li>
+
 </ul>
 </font>
 <hr>
