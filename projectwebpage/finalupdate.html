@@ -49,7 +49,8 @@ color: #FF9900;
 
 <!-- Abstract -->
 <h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Abstract</h3>
-The ability for machines to recognize human emotions has important societal applications ranging from video based sentiment analysis to assisting people with visual impairments. This project aims to extract emotions from video and display a time series visualization of each emotion in real time. To do so, we experiment with two approaches within deep learning: (1) Training the Mini-Xception CNN from scratch and (2) Using VGG-16 to extract features and training our own neural network classifier. We found the Mini-Exception to be our best model with %REPLACE% overall training accuracy and %REPLACE% overall test accuracy. Our final application includes our best model and a visualization tool to run live demos.
+The ability for machines to recognize human emotions has important societal applications ranging from video based sentiment analysis to assisting people with visual impairments. This project aims to extract emotions from video and display a time series visualization of each emotion in real time. To do so, we experiment with two approaches within deep learning: (1) Training the Mini-Xception CNN from scratch and (2) Using VGG-16 to extract features and training our own neural network classifier.
+We found the transfer learning model to be our best model with 66.48% overall training accuracy and 46.31% overall test accuracy. Our final application includes our best model and a visualization tool to run live demos.
 
 <figure style="text-align: left; padding-top: 10px;">
   <figcaption>Figure 1: Application Overview</figcaption>
@@ -83,7 +84,7 @@ Originally proposed by <a href="https://arxiv.org/pdf/1710.07557.pdf">Arriaga</a
 
 
 <h4>The Transfer Learning Approach</h4>
-A popular technique within deep learning is transfer learning which means using a pretrained DNN to build your features represenations and then training a classifier for you own domain. For our pretrained DNN, we used VGG-16, a general purpose object detection network created by the Visual Gemometry Group. We extracted features from our images using the first 13 convolutional layers of VGG-16 and experimented with different classifiers for the emotion recognition task. We tried a SVM classifier and a neural netwok (softmax) classifier.
+A popular technique within deep learning is transfer learning which means using a pretrained DNN to build your features represenations and then training a classifier for you own domain. For our pretrained DNN, we used VGG-16, a general purpose object detection network created by the Visual Gemometry Group. We extracted features from our images using the first 13 convolutional layers of VGG-16 and experimented with different classifiers for the emotion recognition task. The extracted features are then used classified into 7 emotion classes using a neural netwok (softmax) classifier.
 </div>
 
 <figure style="text-align: left; padding-top: 10px;">
@@ -118,11 +119,13 @@ We were able to translate the architecture from the Arriaga into Keras, but we h
 
 <h4>Transfer Learning Approach</h4>
 
-
-
-
-For approach 2, we decided to start off with a generic 5 layer classification DNN. Our first layer had 512 relu activation units, the next had 256 relu units, the next had 128 relu units, the next had 64 relu units and the final one had 7 softmax activation units for our emotion classification. For our loss funciton we selected cross-entropy loss since it's common loss function used in classificaion tasks and for our optimizer we used Adam.
+For approach 2, we started off by using the pre-trained VGG-16 model in extracting useful features for classification. These are some features detected in hidden layers of the model (random samples of features from earlier layers to final layers, from left to right).
 <br><br>
+<img style="height: 200px;" alt="Training Metrics" src="layer1.png">
+<img style="height: 200px;" alt="Training Metrics" src="layer7.png">
+<img style="height: 200px;" alt="Training Metrics" src="layer13.png">
+<br><br>
+Then, we replaced the last 3 fully connected softmax layers in the original model used for 1000-class object classification with a generic 5 layer classification DNN. Our first layer had 512 relu activation units, the next had 256 relu units, the next had 128 relu units, the next had 64 relu units and the final one had 7 softmax activation units for our emotion classification. For our loss funciton we selected cross-entropy loss since it's common loss function used in classificaion tasks and for our optimizer we used Adam.
 After running 20 epochs, we found that the model is overfitting - our validation accuracy was stagnant but training accuracy kept increasing. We employed different techniques to reduce validation loss of the model:
 <br><br>
 1. Early stopping condition: to stop training if validation loss doesn't increase after 5 epochs
