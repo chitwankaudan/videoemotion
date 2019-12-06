@@ -92,7 +92,7 @@ A popular technique within deep learning is transfer learning which means using 
 </figure>
 
 <h4 style="font-size:25px; font-weight: normal; margin-bottom: 10px">Part 2: Extending to Video</h4>
-To extend our classification to videos, we build a program that takes every frame of the video, identifies and extracts the region with the face. For face detection, we used the <a href="https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml">Haar Cascades Frontal Face Detector</a> available on OpenCV. The extracted face is fed the feature extractor, whose output is then fed into the emotion classifier. The emotion classifer returns the probabilities with which it detects each of the 7 emotions. We built a real time visualization using matplotlib that plots these probabilities over time. 
+To extend our classification to videos, we built a program that takes every frame of the video, identifies and extracts the region with the face. For face detection, we used the <a href="https://github.com/opencv/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml">Haar Cascades Frontal Face Detector</a> available on OpenCV. The extracted face is fed the feature extractor, whose output is then fed into the emotion classifier. The emotion classifer returns the probabilities with which it detects each of the 7 emotions. We built a real time visualization using matplotlib that plots these probabilities over time. 
 <hr>
 
 <!-- Experiments & Design -->
@@ -110,13 +110,17 @@ We were able to translate the architecture from the Arriaga into Keras, but we h
 
 <p>As suggested in the Arriaga paper, for the hyperparameters we used relu as our activation function and softmax for the final output classification, we use l2 regularization with weight 0.02 for each separable convolution layers. As suggested in the Introduction to Xception article, we used adam optimizer, cross entropy loss and 100 max epochs. The first time we ran the model, we noticed that after some time the model was overfitting where training loss was decreasing but validation loss was nonincreasing. To combat overfitting, we added batch normalization after each convolution layer and used early stopping with patience 20 epochs. At the end, we chose to keep the model with the lowest validation loss because we felt it would preform best on test data. </p>
 
-<p>Below is the normalized confusion matrix of the best mini_xception model on the test dataset.</p>
+<p>The test accuracy is 42.46%. Below is the normalized confusion matrix of the best mini_xception model on the test dataset.</p>
 
-REPLACE WITH CONFUSION MATRIX
+<img style="height: 400px;" alt="Training Metrics" src="dl_confusion.png">
 
 <p>Our mini-Xceptron does significantly better than baseline guessing where each class is 0.14. It seems like it's better at detecting happy and neutral than the other emotions. We expected this to a degree since happy and neutral are the 2 most populous classes in the FER dataset. </p>
 
-<h4>Evaluating Results from Approach 2</h4>
+<h4>Transfer Learning Approach</h4>
+
+
+
+
 For approach 2, we decided to start off with a generic 5 layer classification DNN. Our first layer had 512 relu activation units, the next had 256 relu units, the next had 128 relu units, the next had 64 relu units and the final one had 7 softmax activation units for our emotion classification. For our loss funciton we selected cross-entropy loss since it's common loss function used in classificaion tasks and for our optimizer we used Adam.
 <br><br>
 After running 20 epochs, we found that the model is overfitting - our validation accuracy was stagnant but training accuracy kept increasing. We employed different techniques to reduce validation loss of the model:
@@ -129,36 +133,11 @@ After running 20 epochs, we found that the model is overfitting - our validation
 <br><br>
 We experimented with a range of dropout values and different dropout layers setup to identify the optimal setup (0.5 dropout after first layer, 0.2 dropout after third layer).
 <div style="text-align: left; padding-top: 10px;">
-<img style="height: 200px;" alt="Training Metrics" src="dropout.png">
+<img style="height: 350px;" alt="Training Metrics" src="dropout.png">
 </div>
+<p>The test accuracy is 46.31%. Below is the normalized confusion matrix of the transfer learning model on the test dataset.</p>
+<img style="height: 400px;" alt="Training Metrics" src="tl_confusion.png">
 <br><br>
-Below are the precision and recall metrics from our training data. The 0-6 are the indexes of the 7 emotion classes-
-[0 : angry, 1 : disgust, 2 : fear, 3 : happy, 4 : sad, 5 : surprise, 6 : neutral]
-<div style="text-align: left; padding-top: 10px;">
-<img style="height: 200px;" alt="Training Metrics" src="training_precisionreacall.png">
-</div>
-
-<br><br>
-Below are the precision and recall metrics from our validation data.
-<div style="text-align: left; padding-top: 10px;">
-<img style="height: 200px;" alt="Validation Metrics" src="validationprecisionrecall.png">
-</div>
-
-<br><br>
-While we have some successes with images in the fer validation set as well as our own photos, it seems like we are still overfitting pretty drastically.
-<br><br>
-<h4>Plausible predictions (Source: FER2013, team member):</h4>
-<div style="text-align: left; padding-top: 10px;">
-<img style="height: 200px;" alt="Validation Metrics" src="success_test_images.png">
-</div>
-<br><br>
-<h4>Inaccurate predictions (Source: FaceDB):</h4>
-<div style="text-align: left; padding-top: 10px;">
-<img style="height: 200px;" alt="Validation Metrics" src="skewed_test_images.png">
-</div>
-<br><br>
-The FER2013 dataset contains a few non-frontal faces, a few distorted faces and even some non-face images. Since our feature space is so rich/dense, it seems like our model is able to tune itself to the random effects in the training data pretty easily.  We did expect our naive DNN to overfit. Furthermore, the skewness of the dataset distribution also contributes to the skewness in prediction outcomes. Out of 35,887 images in the FER2013 dataset, 8,989 are tagged as "happy" while only 527 are tagged as "disgust". This contributed to a disproportionally high number of happy predictions.
-In the next phase of the project, we want to train our model with other dataset with higher definition and more variety to reduce overfitting and improve accuracy. 
 
 <h3 style="font-size:35px; font-weight: normal; margin-bottom: 10px">Qualitative Results</h3>
 By testing the real time application on ourselves, we found that models were better at detecting some emotions than others. For example, happy was detected easily each time with high accuracy. Figure 6 contains a frame of a smiling sequence and the ouput probailites for that sequence. As you can see, the classifier confidently detects approximately 90% happy for sustained period of time. We believe the classifier is good at detecting happy because of the 35,887 images in the FER2013 dataset, 8,989 are happy images. Also, of all the emotions, conveying happiness results in the biggest change to facial features, so it might just be easier to learn happy than something more subtle like sad.
